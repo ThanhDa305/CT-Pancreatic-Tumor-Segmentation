@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🫀 Phân Vùng Khối U Tuyến Tụy Trên Ảnh CT Bằng Học Sâu
+# Phân Vùng Khối U Tuyến Tụy Trên Ảnh CT Bằng Học Sâu
 ### (3D Attention U-Net & Active Learning)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
@@ -12,7 +12,7 @@
 
 ---
 
-## 📌 Giới thiệu đề tài
+## 📌 Giới thiệu nghiên cứu
 Hệ thống tự động phân đoạn nhu mô tuyến tụy và khối u bệnh lý từ ảnh chụp cắt lớp vi tính (CT) 3D vùng bụng. Dự án giải quyết các thách thức lớn trong ảnh y tế như ranh giới mờ, độ tương phản mô mềm thấp và mất cân bằng lớp dữ liệu cực đoan. 
 
 Bằng cách tích hợp chiến lược **Học chủ động (Active Learning)** dựa trên đo lường độ bất định, pipeline giúp giảm thiểu tối đa thời gian và chi phí gán nhãn thủ công từ bác sĩ chuyên khoa.
@@ -76,6 +76,10 @@ Pancreas_Web/
 ├── Kythuattcdl.png              # Sơ đồ kiến trúc / kỹ thuật dự án
 └── main.py                      # Entrypoint chính xử lý suy luận
 ```
+Giao diện phân đoạn
+<img width="1919" height="897" alt="Segmentation-interface" src="https://github.com/user-attachments/assets/ad69b7b9-2def-4ec9-b922-5d69388cd782" />
+
+<img width="1919" height="1079" alt="Segmentation-interface-tumor" src="https://github.com/user-attachments/assets/ed502bf2-6196-44b1-afa8-af4cb4f9dfbd" />
 
 ---
 

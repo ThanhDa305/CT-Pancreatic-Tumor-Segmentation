@@ -20,10 +20,10 @@ Bằng cách tích hợp chiến lược **Học chủ động (Active Learning)
 ---
 
 ## ✨ Tính năng nổi bật
-* 🧬 **Mô hình 3D Attention U-Net**: Sử dụng cơ chế Cổng chú ý (Attention Gates - AGs) giúp mạng nơ-ron tự động tập trung vào khu vực tổn thương và loại bỏ nhiễu từ các cơ quan lân cận trong khoang bụng.
-* ⚖️ **Xử lý mất cân bằng lớp**: Tích hợp hàm mất mát **Tversky Loss** để phạt nặng các lỗi bỏ sót khối u (False Negative).
-* 🎯 **Pipeline Active Learning**: Định lượng độ bất định thông qua **TTA (Test-Time Augmentation)** và chỉ số **Shannon Entropy**, tự động trích xuất Top-K mẫu dữ liệu khó nhất để ưu tiên gán nhãn.
-* 🖥️ **Ứng dụng End-to-End**: Hệ thống tích hợp máy chủ API (**FastAPI**) và giao diện Web tích hợp bộ công cụ **NiiVue**, cho phép bác sĩ tải file `.nii.gz` và tương tác với khối dựng 3D/2D trực tiếp trên trình duyệt.
+*  **Mô hình 3D Attention U-Net**: Sử dụng cơ chế Cổng chú ý (Attention Gates - AGs) giúp mạng nơ-ron tự động tập trung vào khu vực tổn thương và loại bỏ nhiễu từ các cơ quan lân cận trong khoang bụng.
+*  **Xử lý mất cân bằng lớp**: Tích hợp hàm mất mát **Tversky Loss** để phạt nặng các lỗi bỏ sót khối u (False Negative).
+*  **Pipeline Active Learning**: Định lượng độ bất định thông qua **TTA (Test-Time Augmentation)** và chỉ số **Shannon Entropy**, tự động trích xuất Top-K mẫu dữ liệu khó nhất để ưu tiên gán nhãn.
+*  **Ứng dụng End-to-End**: Hệ thống tích hợp máy chủ API (**FastAPI**) và giao diện Web tích hợp bộ công cụ **NiiVue**, cho phép bác sĩ tải file `.nii.gz` và tương tác với khối dựng 3D/2D trực tiếp trên trình duyệt.
 
 ---
 
@@ -76,7 +76,7 @@ Pancreas_Web/
 ├── Kythuattcdl.png              # Sơ đồ kiến trúc / kỹ thuật dự án
 └── main.py                      # Entrypoint chính xử lý suy luận
 ```
-Giao diện phân đoạn
+## 🖥️ Giao diện phân đoạn
 <img width="1919" height="897" alt="Segmentation-interface" src="https://github.com/user-attachments/assets/ad69b7b9-2def-4ec9-b922-5d69388cd782" />
 
 <img width="1919" height="1079" alt="Segmentation-interface-tumor" src="https://github.com/user-attachments/assets/ed502bf2-6196-44b1-afa8-af4cb4f9dfbd" />

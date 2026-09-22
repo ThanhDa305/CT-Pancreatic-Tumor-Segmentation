@@ -43,8 +43,8 @@ Bằng cách tích hợp chiến lược **Học chủ động (Active Learning)
 
 | Đối tượng phân đoạn | Hệ số tương đồng Dice (DSC) |
 | :--- | :---: |
-| 🫀 **Nhu mô Tuyến tụy (Pancreas)** | **0.8133** |
-| 🧫 **Khối u Tuyến tụy (Tumor)** | **0.6297** |
+|  **Nhu mô Tuyến tụy (Pancreas)** | **0.8133** |
+|  **Khối u Tuyến tụy (Tumor)** | **0.6297** |
 
 > 💡 **Hiệu quả Active Learning**: Mô hình đạt ngưỡng hội tụ tối ưu mà không cần gán nhãn toàn bộ tập dữ liệu, giảm thiểu đáng kể khối lượng công việc chú thích y khoa từ chuyên gia.
 

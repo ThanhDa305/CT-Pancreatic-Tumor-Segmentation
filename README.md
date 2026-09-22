@@ -1,4 +1,4 @@
-<img width="447" height="447" alt="image" src="https://github.com/user-attachments/assets/1428a34a-ca49-4be2-afb9-7102d1a8ea22" /># Phân Vùng Khối U Tuyến Tụy Trên Ảnh CT Bằng Học Sâu (3D Attention U-Net & Active Learning)
+Phân Vùng Khối U Tuyến Tụy Trên Ảnh CT Bằng Học Sâu (3D Attention U-Net & Active Learning)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)

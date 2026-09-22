@@ -1,0 +1,391 @@
+/* ===== BASE & THEME ===== */
+/* ===== BASE & THEME ===== */
+:root {
+    /* Tông màu nền trung tính (Grayscale), loại bỏ hoàn toàn sắc xanh ám */
+    --bg-main: #000000;
+    --bg-panel: #1a1a1a;
+    --bg-header: #141414;
+    --border-color: #333333;
+
+    --accent-primary: #4a5568;
+    --accent-hover: #2d3748;
+
+    /* --- ĐÃ ĐẢO MÀU ĐÚNG CHUẨN TỤY ĐỎ, U XANH LÁ --- */
+    --color-pancreas: #ef4444; /* Màu Tuyến tụy: Đỏ tươi (Red) */
+    --color-tumor: #22c55e;    /* Màu Khối u: Xanh lá cây (Green) */
+    /* ---------------------------------------------- */
+
+    --text-main: #e2e8f0;
+    --text-muted: #a0aec0;
+    --font-sans: Arial, Helvetica, sans-serif;
+    --font-mono: monospace;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg-main);
+    color: var(--text-main);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+header {
+    padding: 12px 20px;
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--accent-primary);
+    font-weight: 600;
+    font-size: 1.1em;
+    color: #edf2f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    z-index: 10;
+    position: relative;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+}
+
+/* Đổi tên class thành btn-logout-custom để bypass hoàn toàn app.css */
+.btn-logout-custom {
+    background: #2d3748 !important;
+    color: #fc8181 !important;
+    border: 1px solid #e53e3e !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-weight: 600 !important;
+    font-size: 0.85em !important;
+
+    /* Cực kỳ quan trọng: Triệt tiêu sạch bóng đổ và viền thừa từ app.css */
+    box-shadow: none !important;
+    outline: none !important;
+    text-shadow: none !important;
+    transform: none !important;
+
+    transition: all 0.2s ease;
+}
+
+.btn-logout-custom:hover {
+    background: #e53e3e !important;
+    color: white !important;
+}
+
+/* ===== LAYOUT ===== */
+.main-layout {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 48px);
+}
+
+/* ===== LEFT PANEL (CONTROLS) ===== */
+.controls {
+    width: 240px; /* [CẬP NHẬT] Thu hẹp thanh điều khiển từ 280px xuống 240px */
+    padding: 20px 15px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+}
+
+.controls h3 {
+    margin: 0 0 5px 0;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+
+}
+
+/* INPUT FILE */
+input[type="file"] {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px dashed var(--border-color);
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: border 0.3s;
+}
+input[type="file"]:hover {
+    border-color: var(--accent-primary);
+}
+
+/* BUTTONS */
+.btn-run {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95em;
+    border-radius: 6px;
+
+    transition: background 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 150, 199, 0.2);
+}
+.btn-run:hover { background: var(--accent-hover); }
+
+.mode-group {
+    display: flex;
+    gap: 8px;
+    background: rgba(0,0,0,0.2);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.btn-mode {
+    flex: 1;
+    border: none;
+    padding: 8px;
+    font-size: 0.85em;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+.btn-mode.active {
+    background: var(--border-color);
+    color: #fff;
+}
+
+/* STATUS */
+#status {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    color: var(--accent-primary);
+    padding: 10px 12px;
+    background: rgba(0, 150, 199, 0.05);
+    border-radius: 4px;
+    border-left: 3px solid var(--accent-primary);
+    word-wrap: break-word;
+}
+
+/* ===== CLINICAL TOGGLES & LEGENDS (BỘ CHÚ THÍCH MÀU) ===== */
+.toggle-group {
+    background: rgba(0,0,0,0.15);
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+    font-size: 0.9em;
+    cursor: pointer;
+}
+
+/* Custom Checkbox as a Switch */
+.toggle-label input[type="checkbox"] {
+    appearance: none;
+    width: 32px;
+    height: 18px;
+    background: var(--border-color);
+    border-radius: 20px;
+    position: relative;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+.toggle-label input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 14px; height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+/* Màu công tắc đồng bộ với màu đối tượng */
+#toggleCT:checked { background: var(--accent-primary); }
+#toggleCT:checked::after { transform: translateX(14px); }
+
+#toggleTumor:checked { background: var(--color-tumor); }
+#toggleTumor:checked::after { transform: translateX(14px); }
+
+#togglePancreas:checked { background: var(--color-pancreas); }
+#togglePancreas:checked::after { transform: translateX(14px); }
+
+/* Chú thích màu (Color Legend Blocks) */
+.legend-item {
+    display: flex;
+    align-items: center;
+}
+.legend-item::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    margin-right: 8px;
+}
+
+/* THÊM MÀU CHO CHỮ VÀ IN ĐẬM LÊN CHO RÕ */
+.legend-pancreas { color: var(--color-pancreas); font-weight: bold; }
+.legend-tumor { color: var(--color-tumor); font-weight: bold; }
+
+/* TÔ MÀU CHO Ô VUÔNG TRƯỚC CHỮ */
+.legend-pancreas::before { background-color: var(--color-pancreas); }
+.legend-tumor::before { background-color: var(--color-tumor); }
+
+/* ===== VOLUME METRICS (Giao diện giống máy đo) ===== */
+#volumeInfo {
+    margin-top: auto;
+    background: rgba(0,0,0,0.3);
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vol-title {
+    font-size: 0.75em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 4px;
+}
+
+.vol-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.vol-value {
+    font-family: var(--font-mono);
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+
+/* ===== KHU VỰC VIEWPORT (ẢNH Y KHOA) ===== */
+.viewer-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background: var(--bg-main);
+    box-sizing: border-box;
+}
+
+.viewport-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-panel);
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.9em;
+    color: var(--text-muted);
+}
+
+.viewport-title {
+    font-weight: 600;
+}
+
+.slice-navigator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+}
+
+.slice-navigator input {
+    background: #000;
+    border: 1px solid var(--border-color);
+    color: var(--accent-primary);
+    padding: 4px 6px;
+    border-radius: 4px;
+    text-align: center;
+    font-family: var(--font-mono);
+    width: 50px;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.slice-navigator input:focus {
+    border-color: var(--accent-primary);
+}
+
+.viewport-frame {
+    flex: 1;
+    display: flex;
+    border: 1px solid var(--border-color);
+    border-radius: 0 0 6px 6px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+.canvas-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+canvas {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.scrollbar-wrapper {
+    width: 30px;
+    background: var(--bg-panel);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    padding: 15px 0;
+}
+
+input[type=range] {
+    accent-color: var(--accent-primary);
+}
+input[type=range][orient=vertical] {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 8px;
+    height: 100%;
+    cursor: ns-resize;
+    background: #000;
+    border-radius: 4px;
+}

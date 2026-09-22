@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ Thống Phân Tích Hình Ảnh Y Khoa 3D</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #000; color: #fff; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* --- CSS CHO AUTHENTICATION --- */
+        #authContainer { display: flex; justify-content: center; align-items: center; height: 100vh; background: #0a0a0a; width: 100vw; }
+        .auth-box { background: #1a1a1a; padding: 40px; border-radius: 8px; border: 1px solid #333; width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .auth-box h2 { color: #fff; margin-top: 0; font-size: 1.4em; border-bottom: 1px solid #444; padding-bottom: 15px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #ccc; }
+        .form-control { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 4px; box-sizing: border-box; }
+        .form-control:focus { outline: none; border-color: #0056b3; }
+        .btn-auth { width: 100%; padding: 12px; background: #0056b3; color: #fff; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-auth:hover { background: #0069d9; }
+        .auth-link { text-align: center; margin-top: 15px; font-size: 0.9em; color: #888; }
+        .auth-link a { color: #00aaff; text-decoration: none; cursor: pointer; }
+        .auth-link a:hover { text-decoration: underline; }
+
+        /* --- CSS CHO APP --- */
+        #appContainer { display: none; flex-direction: column; height: 100vh; width: 100vw; }
+        header { padding: 12px; background: #111; text-align: center; border-bottom: 1px solid #0056b3; font-weight: bold; font-size: 1.2em; color: #e0e0e0; }
+        .main-layout { display: flex; flex: 1; height: calc(100vh - 45px); }
+        .controls { width: 320px; padding: 20px; background: #151515; border-right: 1px solid #333; display: flex; flex-direction: column; z-index: 10; }
+        input[type="file"] { background: #222; padding: 8px; border-radius: 4px; border: 1px solid #444; width: 100%; color: #ccc; cursor: pointer; margin-bottom: 15px; box-sizing: border-box;}
+        .btn-run { background: #28a745; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; font-weight: bold; border-radius: 4px; margin-top: 10px; }
+        .btn-run:hover { background: #218838; }
+        .btn-run:disabled { background: #555; cursor: not-allowed; color: #888; }
+        .btn-mode { flex: 1; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        #status { margin-top: 20px; font-size: 0.9em; color: #aaa; padding: 15px; background: #222; border-radius: 4px; border-left: 3px solid #555; }
+        .viewer-container { flex: 1; position: relative; background: #000; }
+        canvas { width: 100%; height: 100%; display: block; outline: none; }
+        .logout-btn { position: absolute; top: 10px; right: 20px; background: #dc3545; border: none; color: #fff; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+
+    <div id="authContainer">
+        <div class="auth-box" id="loginModule">
+            <h2>Đăng Nhập</h2>
+            <div class="form-group">
+                <label>Tên đăng nhập</label>
+                <input type="text" id="logUsername" class="form-control" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="logPassword" class="form-control">
+            </div>
+            <button class="btn-auth" onclick="handleLogin()">Đăng Nhập</button>
+            <div class="auth-link">
+                Chưa có tài khoản? <a onclick="toggleAuthMode('register')">Đăng ký mới</a>
+            </div>
+        </div>
+
+        <div class="auth-box" id="registerModule" style="display: none;">
+            <h2>Đăng Ký Tài Khoản</h2>
+            <div class="form-group">
+                <label>Tên đăng nhập</label>
+                <input type="text" id="regUsername" class="form-control" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="regPassword" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Xác nhận mật khẩu</label>
+                <input type="password" id="regConfirmPassword" class="form-control">
+            </div>
+            <button class="btn-auth" onclick="handleRegister()">Tạo Tài Khoản</button>
+            <div class="auth-link">
+                Đã có tài khoản? <a onclick="toggleAuthMode('login')">Quay lại đăng nhập</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContainer">
+        <header>
+            HỆ THỐNG PHÂN KHÚC VÀ TÁI TẠO 3D TUYẾN TỤY
+            <button class="logout-btn" onclick="handleLogout()">Đăng Xuất</button>
+        </header>
+        <div class="main-layout">
+            <div class="controls">
+                <h3>Dữ liệu đầu vào (CT Scan)</h3>
+                <input type="file" id="fileInput" accept=".nii.gz, .nii">
+                <button class="btn-run" onclick="processAI()" id="runBtn">Xử Lý Hình Ảnh AI</button>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-mode" onclick="window.nv.setSliceType(window.nv.sliceTypeMultiplanar)" style="background:#333; color:#fff;">MPR</button>
+                    <button class="btn-mode" onclick="window.nv.setSliceType(window.nv.sliceTypeRender)" style="background:#0056b3; color:#fff;">VR 3D</button>
+                </div>
+
+                <div id="status">Trạng thái: Đang chờ dữ liệu.</div>
+
+                <div id="volumeInfo" style="margin-top:15px; background:#222; padding:15px; border-radius:4px; display:none;">
+                    <strong>THỂ TÍCH (Voxels):</strong><br>
+                    - Tuyến tụy: <span id="volPancreas" style="color:#00aaff;">0</span><br>
+                    - Khối u: <span id="volTumor" style="color:#dc3545;">0</span>
+                </div>
+            </div>
+            <div class="viewer-container">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { Niivue } from "https://esm.sh/@niivue/niivue";
+
+        // --- BỘ ĐIỀU KHIỂN XÁC THỰC (AUTH CONTROLLER) ---
+        window.toggleAuthMode = function(mode) {
+            document.getElementById('logUsername').value = '';
+            document.getElementById('logPassword').value = '';
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirmPassword').value = '';
+
+            if (mode === 'register') {
+                document.getElementById('loginModule').style.display = 'none';
+                document.getElementById('registerModule').style.display = 'block';
+            } else {
+                document.getElementById('registerModule').style.display = 'none';
+                document.getElementById('loginModule').style.display = 'block';
+            }
+        };
+
+        window.handleRegister = function() {
+            const user = document.getElementById('regUsername').value.trim();
+            const pass = document.getElementById('regPassword').value;
+            const confirmPass = document.getElementById('regConfirmPassword').value;
+
+            if (!user || !pass) return alert("Lỗi: Các trường không được để trống.");
+            if (pass !== confirmPass) return alert("Lỗi: Mật khẩu xác nhận không khớp.");
+            if (localStorage.getItem('user_' + user)) return alert("Lỗi: Tên đăng nhập đã tồn tại.");
+
+            // Lưu dữ liệu vào Local Storage
+            localStorage.setItem('user_' + user, pass);
+            alert("Hệ thống: Đăng ký thành công. Vui lòng tiến hành đăng nhập.");
+            toggleAuthMode('login');
+        };
+
+        window.handleLogin = function() {
+            const user = document.getElementById('logUsername').value.trim();
+            const pass = document.getElementById('logPassword').value;
+
+            if (!user || !pass) return alert("Lỗi: Yêu cầu nhập đầy đủ thông tin.");
+
+            // Truy xuất dữ liệu từ Local Storage
+            const storedPass = localStorage.getItem('user_' + user);
+
+            if (storedPass && storedPass === pass) {
+                document.getElementById('authContainer').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'flex';
+                initApp(); // Khởi tạo đồ họa sau khi đăng nhập thành công
+            } else {
+                alert("Lỗi: Thông tin xác thực không chính xác.");
+            }
+        };
+
+        window.handleLogout = function() {
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'flex';
+            document.getElementById('logUsername').value = '';
+            document.getElementById('logPassword').value = '';
+        };
+
+        // --- BỘ ĐIỀU KHIỂN ỨNG DỤNG LÕI (CORE APP CONTROLLER) ---
+        let isAppInitialized = false;
+
+        function initApp() {
+            if (isAppInitialized) return; // Tránh khởi tạo lại Niivue nhiều lần
+
+            window.nv = new Niivue({
+                show3Dcrosshair: true,
+                crosshairColor: [1, 0, 0, 1],
+                backColor: [0, 0, 0, 1],
+                multiplanarForceRender: true
+            });
+            window.nv.attachTo('canvas');
+            window.nv.setSliceType(window.nv.sliceTypeMultiplanar);
+            isAppInitialized = true;
+        }
+
+        window.processAI = async function() {
+            const fileInput = document.getElementById('fileInput');
+            const status = document.getElementById('status');
+            const btn = document.getElementById('runBtn');
+            const volPanel = document.getElementById('volumeInfo');
+
+            if (!fileInput.files[0]) {
+                alert("Lỗi: Chưa cung cấp tệp dữ liệu đầu vào.");
+                return;
+            }
+
+            status.style.borderLeftColor = "#ffaa00";
+            status.innerHTML = "Đang xử lý phân khúc. Vui lòng đợi...";
+            btn.disabled = true;
+            volPanel.style.display = "none";
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch('/predict', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                if (res.ok && data.pancreas_url) {
+                    status.style.borderLeftColor = "#28a745";
+                    status.innerHTML = "Xử lý thành công.";
+
+                    document.getElementById('volPancreas').innerText = data.pancreas_vol;
+                    document.getElementById('volTumor').innerText = data.tumor_vol;
+                    volPanel.style.display = "block";
+
+                    const volumeList = [
+                        { url: data.orig_url, opacity: 1, colormap: "gray" },
+                        { url: data.pancreas_url, opacity: 0.4, colormap: "red", cal_min: 0, cal_max: 1 },
+                        { url: data.tumor_url, opacity: 0.9, colormap: "green", cal_min: 0, cal_max: 1 }
+                    ];
+
+                    await window.nv.loadVolumes(volumeList);
+                    window.nv.setSliceType(window.nv.sliceTypeRender);
+                } else {
+                    throw new Error(data.error || "Phản hồi từ server không hợp lệ.");
+                }
+            } catch (e) {
+                status.style.borderLeftColor = "#ff4d4d";
+                status.innerHTML = "Lỗi kết nối/máy chủ: " + e.message;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

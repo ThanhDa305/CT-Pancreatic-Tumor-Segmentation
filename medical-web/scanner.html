@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedAI - Pancreas & Tumor Segmentation</title>
+    <link rel="stylesheet" href="css/app.css?v=3">
+
+    <style>
+        :root {
+            --color-pancreas: #ef4444; /* Đỏ */
+            --color-tumor: #22c55e;    /* Xanh lá */
+            --text-muted: #a0aec0;
+            --border-color: #4a5568;
+            --bg-dark: #1a202c;
+        }
+
+        .legend-pancreas { color: var(--color-pancreas) !important; font-weight: 600; }
+        .legend-tumor { color: var(--color-tumor) !important; font-weight: 600; }
+
+        .canvas-wrapper { flex: 1; position: relative; display: flex; width: 100%; height: 100%; }
+        .placeholder-grid {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+            gap: 2px; background: #333333; z-index: 10; width: 100%; height: 100%;
+        }
+        .placeholder-grid > div {
+            background: #000000; display: flex; justify-content: center; align-items: center;
+            color: #a0aec0; font-size: 0.85em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        /* --- CẤU HÌNH ĐÃ XÍCH RA XA NHA ÔNG --- */
+        .header-actions {
+            display: flex;
+            gap: 40px; /* Tăng khoảng cách lên hẳn 40px cho thênh thang */
+            align-items: center;
+        }
+        .lang-btn {
+            background: #2d3748; color: white; border: 1px solid #4a5568;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 0.85em; transition: all 0.2s;
+        }
+        .lang-btn:hover { background: #4a5568; }
+
+        /* Style nhẹ cho nút logout để phân biệt rõ với nút đổi ngôn ngữ */
+        .logout-btn {
+            background: #2d3748; color: #fc8181; border: 1px solid #e53e3e;
+            padding: 6px 12px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 0.85em; transition: all 0.2s;
+        }
+        .logout-btn:hover { background: #e53e3e; color: white; }
+    </style>
+</head>
+<body>
+    <header style="display: flex; justify-content: space-between; padding: 10px 20px; background: var(--bg-dark); border-bottom: 1px solid var(--border-color);">
+        <div class="header-title" data-vi="HỆ THỐNG PHÂN ĐOẠN HÌNH ẢNH 3 CHIỀU TUYẾN TỤY & KHỐI U" data-en="3D PANCREAS & TUMOR SEGMENTATION SYSTEM">
+            HỆ THỐNG PHÂN ĐOẠN HÌNH ẢNH 3 CHIỀU TUYẾN TỤY & KHỐI U
+        </div>
+        <div class="header-actions">
+            <button class="lang-btn" id="btnLang">🇻🇳 VI | EN</button>
+            <button class="logout-btn" id="btnLogout" data-vi="Ngắt Kết Nối" data-en="Disconnect">Ngắt Kết Nối</button>
+        </div>
+    </header>
+
+    <div class="main-layout" style="display: flex; height: calc(100vh - 50px);">
+        <div class="controls" style="width: 300px; padding: 20px; border-right: 1px solid var(--border-color); display: flex; flex-direction: column;">
+            <div>
+                <h3 data-vi="Dữ liệu đầu vào chuẩn NIfTI" data-en="NIfTI Standard Input Data">Dữ liệu đầu vào chuẩn NIfTI</h3>
+                <input type="file" id="fileInput" accept=".nii.gz, .nii">
+            </div>
+
+            <button class="btn-run" id="btnRunAI" data-vi="Tiến Hành Phân Đoạn" data-en="Run Segmentation" style="margin-top: 15px; padding: 10px; background: #3182ce; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                Tiến Hành Phân Đoạn
+            </button>
+
+            <div class="mode-group" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-mode active" id="btnModeMPR" style="flex: 1;">MPR 2D</button>
+                <button class="btn-mode" id="btnModeVR" style="flex: 1;">VR 3D</button>
+            </div>
+
+            <div class="toggle-group" id="layerToggles" style="display: none; margin-top: 15px; flex-direction: column; gap: 8px;">
+                <label class="toggle-label">
+                    <input type="checkbox" id="toggleCT" checked>
+                    <span class="legend-item" style="color: var(--text-muted);" data-vi="Toàn Bộ Cơ Quan" data-en="Whole Organ (CT)">Toàn Bộ Cơ Quan</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="togglePancreas" checked>
+                    <span class="legend-item legend-pancreas" data-vi="Lớp Tuyến Tụy" data-en="Pancreas Layer">Lớp Tuyến Tụy</span>
+                </label>
+                <label class="toggle-label">
+                    <input type="checkbox" id="toggleTumor" checked>
+                    <span class="legend-item legend-tumor" data-vi="Lớp Khối U" data-en="Tumor Layer">Lớp Khối U</span>
+                </label>
+            </div>
+
+            <div id="status" style="margin-top: 15px; font-size: 0.9em; color: var(--text-muted);" data-vi="Đang chờ nhập dữ liệu..." data-en="Waiting for data input...">Đang chờ nhập dữ liệu...</div>
+
+            <div id="volumeInfo" style="display:none; margin-top: auto; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); flex-direction: column; gap: 8px;">
+                <div class="vol-title" style="font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-bottom: 5px;" data-vi="Phân Tích Thể Tích (Voxel)" data-en="Volume Analysis (Voxel)">Phân Tích Thể Tích (Voxel)</div>
+
+                <div class="vol-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9em;">
+                    <span class="legend-item legend-pancreas" data-vi="Tuyến Tụy" data-en="Pancreas">Tuyến Tụy</span>
+                    <div style="text-align: right;">
+                        <span id="volPancreas" class="vol-value" style="color: var(--color-pancreas); font-weight: bold;">0</span>
+                    </div>
+                </div>
+
+                <div class="vol-row" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; margin-top: 5px;">
+                    <span class="legend-item legend-tumor" data-vi="Khối U" data-en="Tumor">Khối U</span>
+                    <div style="text-align: right;">
+                         <span id="volTumor" class="vol-value" style="color: var(--color-tumor); font-weight: bold;">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="performanceInfo" style="display:none; margin-top: 10px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); flex-direction: column; gap: 8px;">
+                <div class="vol-title" style="font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 4px; margin-bottom: 5px;" data-vi="Thông Số Hiệu Năng (Benchmark)" data-en="Performance Metrics (Benchmark)">Thông Số Hiệu Năng (Benchmark)</div>
+
+                <div class="vol-row" style="display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 2px;">
+                    <span style="color: var(--text-muted);" data-vi="Tổng thời gian:" data-en="Total time:">Tổng thời gian:</span>
+                    <span id="perfTotal" style="color: #63b3ed; font-weight: bold;">0s</span>
+                </div>
+
+                <div class="vol-row" style="display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 2px;">
+                    <span style="color: var(--text-muted);" data-vi="Tiền xử lý O(N):" data-en="Preprocessing O(N):">Tiền xử lý O(N):</span>
+                    <span id="perfPre" style="color: #f6ad55;">0s</span>
+                </div>
+
+                <div class="vol-row" style="display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 2px;">
+                    <span style="color: var(--text-muted);" data-vi="Nội suy AI:" data-en="AI Inference:">Nội suy AI:</span>
+                    <span id="perfInf" style="color: #f6ad55;">0s</span>
+                </div>
+
+                <div class="vol-row" style="display: flex; justify-content: space-between; font-size: 0.85em; border-top: 1px dashed #444; margin-top: 2px; padding-top: 2px;">
+                    <span style="color: var(--text-muted);" data-vi="Số lát cắt xử lý:" data-en="Processed slices:">Số lát cắt xử lý:</span>
+                    <span id="perfSlices" style="color: #fff;">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="viewer-area" style="flex: 1; display: flex; flex-direction: column; padding: 20px;">
+            <div class="viewport-header" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span class="viewport-title" style="font-weight: bold;" data-vi="Góc nhìn Trục (Axial)" data-en="Axial View">Góc nhìn Trục (Axial)</span>
+                <div class="slice-navigator">
+                    <span data-vi="Lát cắt:" data-en="Slice:">Lát cắt:</span>
+                    <input type="number" id="sliceInput" min="1" max="1" value="1" style="width: 50px;">
+                    / <span id="maxSlice">1</span>
+                </div>
+            </div>
+
+            <div class="viewport-frame" style="flex: 1; display: flex; gap: 10px;">
+                <div class="canvas-wrapper">
+                    <div id="placeholderGrid" class="placeholder-grid">
+                        <div data-vi="Trục (Axial)" data-en="Axial">Trục (Axial)</div>
+                        <div data-vi="Đứng Ngang (Coronal)" data-en="Coronal">Đứng Ngang (Coronal)</div>
+                        <div data-vi="Đứng Dọc (Sagittal)" data-en="Sagittal">Đứng Dọc (Sagittal)</div>
+                        <div data-vi="Mô Hình 3D (VR)" data-en="3D Model (VR)">Mô Hình 3D (VR)</div>
+                    </div>
+                    <canvas id="canvas" style="width: 100%; height: 100%; background: black;"></canvas>
+                </div>
+                <div class="scrollbar-wrapper">
+                    <input type="range" id="sliceSlider" orient="vertical" min="1" max="1" step="1" value="1" style="height: 100%;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/scanner.js?v=3"></script>
+
+    <script>
+        const btnMPR = document.getElementById('btnModeMPR');
+        const btnVR = document.getElementById('btnModeVR');
+
+        btnMPR.addEventListener('click', () => {
+            btnMPR.classList.add('active');
+            btnVR.classList.remove('active');
+        });
+        btnVR.addEventListener('click', () => {
+            btnVR.classList.add('active');
+            btnMPR.classList.remove('active');
+        });
+
+        // LOGIC CHUYỂN ĐỔI ĐA NGÔN NGỮ (Bilingual UI)
+        const btnLang = document.getElementById('btnLang');
+        let currentLang = 'vi';
+
+        const translatableElements = document.querySelectorAll('[data-vi]');
+
+        function updateLanguage() {
+            translatableElements.forEach(el => {
+                el.innerText = el.getAttribute(`data-${currentLang}`);
+            });
+            btnLang.innerText = currentLang === 'vi' ? '🇻🇳 VI | EN' : '🇬🇧 EN | VI';
+        }
+
+        btnLang.addEventListener('click', () => {
+            currentLang = currentLang === 'vi' ? 'en' : 'vi';
+            updateLanguage();
+        });
+    </script>
+</body>
+</html>

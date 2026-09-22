@@ -1,4 +1,4 @@
-# Phân Vùng Khối U Tuyến Tụy Trên Ảnh CT Bằng Học Sâu (3D Attention U-Net & Active Learning)
+<img width="447" height="447" alt="image" src="https://github.com/user-attachments/assets/1428a34a-ca49-4be2-afb9-7102d1a8ea22" /># Phân Vùng Khối U Tuyến Tụy Trên Ảnh CT Bằng Học Sâu (3D Attention U-Net & Active Learning)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
@@ -54,3 +54,18 @@ Pancreas_Web/
 |   ├── best_model_tumor.pt       # Trọng số mô hình dự đoán khối u tối ưu
 |   ├── check_weight.py           # Script kiểm tra và load trọng số mô hình
 |   └── main.py                   # Entrypoint chính xử lý suy luận
+```
+🚀 Hướng dẫn cài đặt & Chạy ứng dụng
+1. Khởi tạo môi trường
+```text
+clone https://github.com/your-username/pancreatic-tumor-segmentation.git
+cd pancreatic-tumor-segmentation
+
+python -m venv venv
+source venv/bin/activate  # Trên Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+2. Khởi chạy Backend API ServerBashuvicorn backend.app.main:app --reload --port 8000
+3. Trải nghiệm giao diệnMở tệp frontend/index.html bằng trình duyệt web để tải file NIfTI ảnh CT và xem kết quả phân đoạn 3D tương tác.
+
+Tác giả: Nguyễn Thanh Đa (MSSV: B2203436) — Khoa Hệ thống Thông tin, Trường Công nghệ Thông tin & Truyền thông, Đại học Cần Thơ.   
